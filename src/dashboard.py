@@ -20,10 +20,13 @@ st.caption("E-commerce Analytics & Business Intelligence Dashboard")
 needed = [
     "daily_sales.csv",
     "customer_summary.csv",
-    "funnel_summary.csv"
+    "funnel_summary.csv",
+    "product_summary.csv",
+    "category_summary.csv",
+    "retention_summary.csv"
 ]
 
-# Prepare data if output files are missing
+# Prepare data if any output file is missing
 if not all((OUT / x).exists() for x in needed):
     with st.spinner("Preparing RetailPulse data..."):
         subprocess.run(
@@ -35,9 +38,13 @@ if not all((OUT / x).exists() for x in needed):
             check=True
         )
 
-sales = pd.read_csv(OUT / needed[0], parse_dates=["day"])
-customers = pd.read_csv(OUT / needed[1])
-funnel = pd.read_csv(OUT / needed[2])
+# Load datasets
+sales = pd.read_csv(OUT / "daily_sales.csv", parse_dates=["day"])
+customers = pd.read_csv(OUT / "customer_summary.csv")
+funnel = pd.read_csv(OUT / "funnel_summary.csv")
+products = pd.read_csv(OUT / "product_summary.csv")
+categories = pd.read_csv(OUT / "category_summary.csv")
+retention = pd.read_csv(OUT / "retention_summary.csv")
 
 sales["day"] = pd.to_datetime(sales["day"])
 sales = sales.sort_values("day")
@@ -64,7 +71,7 @@ if len(date_range) == 2:
 else:
     filtered_sales = sales
 
-# Key performance indicators
+# Main KPIs
 total_revenue = filtered_sales["revenue"].sum()
 total_orders = filtered_sales["orders"].sum()
 average_order = total_revenue / max(total_orders, 1)
@@ -72,14 +79,13 @@ average_order = total_revenue / max(total_orders, 1)
 st.subheader("Key Performance Indicators")
 
 a, b, c = st.columns(3)
-
 a.metric("Total Revenue", f"£{total_revenue:,.2f}")
 b.metric("Total Orders", f"{int(total_orders):,}")
 c.metric("Average Order Value", f"£{average_order:,.2f}")
 
 st.divider()
 
-# Daily revenue analysis
+# Revenue trends
 st.subheader("Daily Revenue Trend")
 
 if not filtered_sales.empty:
@@ -90,7 +96,6 @@ if not filtered_sales.empty:
 else:
     st.info("No sales data available for this date range.")
 
-# Monthly revenue analysis
 st.subheader("Monthly Revenue Analysis")
 
 if not filtered_sales.empty:
@@ -100,37 +105,97 @@ if not filtered_sales.empty:
         .resample("ME")["revenue"]
         .sum()
     )
-
     st.bar_chart(monthly_sales, width="stretch")
-else:
-    st.info("No monthly revenue data available.")
 
 st.divider()
 
-# Customer and funnel analysis
+# Product performance
+st.header("Product Performance Analytics")
+
+left, right = st.columns(2)
+
+left.subheader("Top 10 Products by Revenue")
+left.bar_chart(
+    products.head(10).set_index("product_id")["revenue"],
+    width="stretch"
+)
+
+right.subheader("Revenue by Category")
+right.bar_chart(
+    categories.set_index("category")["revenue"],
+    width="stretch"
+)
+
+st.subheader("Product Performance Details")
+st.dataframe(products.head(20), width="stretch")
+
+st.divider()
+
+# Customer retention
+st.header("Customer Retention Analytics")
+
+repeat = retention[
+    retention["customer_segment"] == "Repeat customer"
+]["customer_count"].sum()
+
+one_time = retention[
+    retention["customer_segment"] == "One-time customer"
+]["customer_count"].sum()
+
+no_purchase = retention[
+    retention["customer_segment"] == "No purchase"
+]["customer_count"].sum()
+
+total_customers = repeat + one_time + no_purchase
+repeat_rate = repeat / max(total_customers, 1) * 100
+
+a, b, c = st.columns(3)
+a.metric("Repeat Customers", f"{int(repeat):,}")
+b.metric("One-time Customers", f"{int(one_time):,}")
+c.metric("Repeat Customer Rate", f"{repeat_rate:.1f}%")
+
+st.bar_chart(
+    retention.set_index("customer_segment")["customer_count"],
+    width="stretch"
+)
+
+st.dataframe(retention, width="stretch")
+
+st.divider()
+
+# Customer and event analysis
+st.header("Customer & Conversion Analysis")
+
 left, right = st.columns(2)
 
 left.subheader("Top Customers")
 left.dataframe(customers.head(15), width="stretch")
 
-right.subheader("Event Funnel")
+right.subheader("Customer Event Funnel")
 right.bar_chart(
-    funnel.set_index("event_type")["event_count"],
+    funnel.set_index("event_type")["unique_customers"],
     width="stretch"
 )
 right.dataframe(funnel, width="stretch")
 
+st.caption(
+    "Funnel metrics represent unique customers by event type, "
+    "not session-based conversion."
+)
+
 st.divider()
 
 # Business insights
-st.subheader("Business Performance Insights")
+st.header("Business Performance Insights")
 
 if not filtered_sales.empty:
     best_day = filtered_sales.loc[
         filtered_sales["revenue"].idxmax()
     ]
 
-    insight1, insight2 = st.columns(2)
+    best_category = categories.iloc[0]
+
+    insight1, insight2, insight3 = st.columns(3)
 
     insight1.metric(
         "Highest Revenue Day",
@@ -142,8 +207,19 @@ if not filtered_sales.empty:
         f"£{best_day['revenue']:,.2f}"
     )
 
+    insight3.metric(
+        "Top Revenue Category",
+        best_category["category"]
+    )
+
     st.write(
         f"During the selected period, the business generated "
-        f"**£{total_revenue:,.2f}** in revenue from "
+        f"**£{total_revenue:,.2f}** from "
         f"**{int(total_orders):,} orders**."
+    )
+
+    st.write(
+        f"The highest-revenue product category is "
+        f"**{best_category['category']}**, generating "
+        f"**£{best_category['revenue']:,.2f}** overall."
     )
