@@ -1,142 +1,143 @@
-# RetailPulse — E-commerce Analytics Platform
+# RetailPulse — E-commerce Analytics Project
 
-**A personal data engineering and analytics project built with Python, DuckDB and Streamlit.**
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Streamlit-FF4B4B?logo=streamlit)](https://retailpulse-ecommerce-analytics-fdwhk7xqcqt4xc2y29zee4.streamlit.app/)
 
-## About the Project
+**Live Dashboard:** [Explore RetailPulse](https://retailpulse-ecommerce-analytics-fdwhk7xqcqt4xc2y29zee4.streamlit.app/)
 
-I built RetailPulse to explore how raw e-commerce data can be transformed into meaningful business insights using data engineering and analytics tools.
+## Why I Started This Project
 
-The project takes customer, product, order and website activity data, processes it through a Python and DuckDB pipeline, and presents the results through an interactive Streamlit dashboard.
+I wanted to challenge myself by building a practical data analytics project from scratch rather than just following tutorials or working with isolated examples.
 
-My main focus was to build a complete workflow — from generating raw data and processing it to analysing business metrics and presenting the results.
+I started exploring how e-commerce businesses collect data, how that data can be processed, and how useful business insights can be generated from it.
 
-## What I Developed
+That idea led me to build **RetailPulse**, a small end-to-end e-commerce analytics platform where I could experiment with Python, SQL, DuckDB, Pandas and Streamlit.
 
-I worked on the following components:
+This project is part of my journey to strengthen my practical skills in data analytics, data engineering and business intelligence.
 
-- **Data Generation:** Created a reproducible synthetic e-commerce dataset containing customers, products, orders, order items and website events.
-- **Data Processing:** Built a Python pipeline using DuckDB to load, clean and transform the raw datasets.
-- **Data Validation:** Added handling for duplicate records, invalid values and missing information.
-- **Sales Analytics:** Calculated daily revenue, order counts, units sold and average order value.
-- **Customer Analytics:** Generated customer-level purchase summaries and lifetime revenue.
-- **Event Analytics:** Analysed product views, add-to-cart activities and purchase events.
-- **Dashboard Development:** Built an interactive dashboard using Streamlit to present the analytics results.
+## What I Tried to Build
 
-## Technology Stack
+My goal was to create a simple but functional analytics workflow:
 
-| Technology | Purpose |
-|---|---|
-| Python | Pipeline development |
-| DuckDB | Data processing and analytical queries |
-| Pandas | Data handling |
-| Streamlit | Interactive dashboard |
-| Docker | Containerisation |
-| Git & GitHub | Version control |
+- Generate sample e-commerce data for customers, products, orders and customer activities.
+- Process and analyse the data using Python and DuckDB.
+- Calculate revenue, order performance and customer-level summaries.
+- Explore customer activity through an event funnel.
+- Present the results in an interactive dashboard using Streamlit.
 
-## Project Results
+I wanted to understand how all these individual components could work together in a real-world-style project.
 
-I tested the pipeline using the generated sample dataset.
+## Technologies I Used
 
-**Local execution results:**
+While building this project, I worked with:
+
+- **Python** — data generation and processing.
+- **Pandas** — data manipulation and analysis.
+- **DuckDB** — SQL-based analytical queries.
+- **Streamlit** — interactive dashboard development.
+- **Git & GitHub** — version control and project management.
+
+## A Look at the Results
+
+After generating the sample data and running the pipeline, the dashboard currently displays:
 
 | Metric | Result |
 |---|---:|
-| Processed orders | 1,363 |
-| Total revenue | £1,010,607.49 |
-| Average order value | £741.46 |
-| Automated tests | 3/3 passed |
+| Total Revenue | £1,010,607.49 |
+| Total Orders | 1,363 |
+| Average Order Value | £741.46 |
 
-All three automated tests passed, covering order processing, output generation and revenue validation.
+*These figures are based on synthetic data generated for this project, not actual commercial transactions.*
 
-These figures are from the synthetic development dataset and are not real customer or business transactions.
+The dashboard also includes daily revenue trends, top customer summaries and an event funnel.
 
-## Dashboard
+## How I Structured the Project
 
-The Streamlit dashboard currently provides:
+```text
+retailpulse/
+├── data/
+│   ├── raw/
+│   └── output/
+├── src/
+│   ├── generate_data.py
+│   ├── pipeline.py
+│   └── dashboard.py
+├── tests/
+│   └── test_pipeline.py
+├── requirements.txt
+├── Dockerfile
+└── README.md
+```
 
-- Overall revenue and order metrics
-- Average order value
-- Daily revenue trends
-- Customer-level summaries
-- Event funnel analytics
+I separated the data generation, processing and dashboard components so that each part has its own responsibility.
 
 ## Running the Project Locally
 
-Clone the repository:
+If you want to explore the project on your own machine:
+
+**1. Clone the repository**
 
 ```bash
-git clone YOUR_REPOSITORY_URL
-cd retailpulse
+git clone https://github.com/shifat-sketch/retailpulse-ecommerce-analytics.git
+cd retailpulse-ecommerce-analytics
 ```
 
-Install dependencies:
+**2. Install the dependencies**
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Generate the sample dataset:
+**3. Generate the sample data**
 
 ```bash
 python src/generate_data.py
 ```
 
-Run the analytics pipeline:
+**4. Run the data pipeline**
 
 ```bash
 python src/pipeline.py
 ```
 
-Run automated tests:
-
-```bash
-python -m unittest discover -s tests -v
-```
-
-Launch the dashboard:
+**5. Start the dashboard**
 
 ```bash
 streamlit run src/dashboard.py
 ```
 
-## Project Structure
+You can then open `http://localhost:8501` in your browser.
 
-```text
-retailpulse/
-│
-├── data/
-│   ├── raw/
-│   └── output/
-│
-├── src/
-│   ├── generate_data.py
-│   ├── pipeline.py
-│   └── dashboard.py
-│
-├── tests/
-│   └── test_pipeline.py
-│
-├── Dockerfile
-├── requirements.txt
-├── .gitignore
-└── README.md
+## Testing
+
+I also added basic automated tests to check whether the pipeline generates the expected output files and produces valid results.
+
+Run the tests using:
+
+```bash
+python -m unittest discover -s tests -v
 ```
 
-## Future Improvements
+## What's Next?
 
-There are several areas I would like to explore next:
+This is an ongoing learning project, and there are several things I would like to explore next:
 
-- Improve pipeline performance for larger datasets.
-- Add more advanced customer segmentation.
-- Introduce marketing channel attribution.
-- Add more detailed product and category analytics.
-- Implement automated data quality checks.
-- Deploy the dashboard for public access.
+- Product and category performance analysis.
+- Monthly and seasonal revenue trends.
+- Customer retention and repeat purchase analysis.
+- Conversion rate and funnel optimisation.
+- More interactive dashboard filters.
+- Improved data quality checks and testing.
 
-## About My Work
+I plan to keep improving the project as I learn more and experiment with additional analytics techniques.
 
-I developed this project as part of my ongoing learning and practical work in data engineering, analytics and Python-based application development.
+## A Little About Me
 
-I am continuing to improve the pipeline, explore better data processing techniques and expand the analytical features.
+I'm Shifat Ahamed, with a background in Computer Science and an interest in Artificial Intelligence, Machine Learning and Data Analytics.
 
-**This project is a work in progress, and I plan to build on it further.**
+I enjoy learning by building things, experimenting with technologies and turning ideas into practical projects.
+
+If you have any suggestions or feedback, I'd genuinely appreciate it.
+
+**GitHub Repository:** [RetailPulse on GitHub](https://github.com/shifat-sketch/retailpulse-ecommerce-analytics)
+
+**Live Demo:** [Try the RetailPulse Dashboard](https://retailpulse-ecommerce-analytics-fdwhk7xqcqt4xc2y29zee4.streamlit.app/)
