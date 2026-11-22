@@ -1,19 +1,14 @@
 
 from pathlib import Path
-import subprocess
-import sys
-
 import pandas as pd
 import streamlit as st
+import subprocess
+import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "data" / "output"
 
-st.set_page_config(
-    page_title="RetailPulse",
-    page_icon="📊",
-    layout="wide"
-)
+st.set_page_config(page_title="RetailPulse", page_icon="📊", layout="wide")
 
 st.title("RetailPulse")
 st.caption("E-commerce performance overview")
@@ -24,44 +19,29 @@ needed = [
     "funnel_summary.csv"
 ]
 
-# Generate data and run the pipeline if outputs are missing
-if not all((OUT / file).exists() for file in needed):
-    with st.spinner("Preparing RetailPulse analytics..."):
-        try:
-            subprocess.run(
-                [sys.executable, str(ROOT / "src" / "generate_data.py")],
-                cwd=ROOT,
-                check=True
-            )
-
-            subprocess.run(
-                [sys.executable, str(ROOT / "src" / "pipeline.py")],
-                cwd=ROOT,
-                check=True
-            )
-
-        except subprocess.CalledProcessError as error:
-            st.error(f"Data preparation failed: {error}")
-            st.stop()
-
-if not all((OUT / file).exists() for file in needed):
-    st.error("The analytics output files could not be created.")
-    st.stop()
+# Generate data and run the pipeline if output files are missing
+if not all((OUT / x).exists() for x in needed):
+    with st.spinner("Preparing RetailPulse data..."):
+        subprocess.run(
+            [sys.executable, str(ROOT / "src" / "generate_data.py")],
+            check=True
+        )
+        subprocess.run(
+            [sys.executable, str(ROOT / "src" / "pipeline.py")],
+            check=True
+        )
 
 sales = pd.read_csv(OUT / needed[0], parse_dates=["day"])
 customers = pd.read_csv(OUT / needed[1])
 funnel = pd.read_csv(OUT / needed[2])
 
-total_revenue = sales["revenue"].sum()
-total_orders = sales["orders"].sum()
-
 a, b, c = st.columns(3)
 
-a.metric("Revenue", f"£{total_revenue:,.2f}")
-b.metric("Orders", f"{int(total_orders):,}")
+a.metric("Revenue", f"£{sales.revenue.sum():,.2f}")
+b.metric("Orders", f"{int(sales.orders.sum()):,}")
 c.metric(
     "Average order value",
-    f"£{total_revenue / max(total_orders, 1):,.2f}"
+    f"£{sales.revenue.sum() / max(sales.orders.sum(), 1):,.2f}"
 )
 
 st.subheader("Daily revenue")
